@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags always come first -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css"
+          integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <h1>Telepresence via Room.co!</h1>
+
+    <div class="card">
+        <div class="card-block">
+            <h4 class="card-title">Quick Setup</h4>
+            <p class="card-text">
+                Conference ID is your unique channel, and must be used by all clients.
+            </p>
+
+            <p class="card-text">
+                <label for="conference-id">Conference ID</label>
+                <input type="text" id="conference-id" placeholder="">
+            </p>
+            <a href="#" id="save" class="btn btn-primary">Save & Launch</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.nodeRequire = require;
+    delete window.require;
+    delete window.exports;
+    delete window.module;
+</script>
+
+<!-- jQuery first, then Bootstrap JS. -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js"
+        integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7"
+        crossorigin="anonymous"></script>
+
+<script>
+    function randomDigits() {
+        return Math.round(Math.random() * 100000000000);
+    }
+
+    $('#conference-id').val(`${randomDigits()}`);
+
+    $('#save').click(function () {
+        const ipcRenderer = nodeRequire('electron').ipcRenderer;
+
+        ipcRenderer.send('setup-complete', {conferenceId: $('#conference-id').val()});
+    });
+</script>
+</body>
+</html>
