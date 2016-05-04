@@ -85,7 +85,9 @@ function openConferenceRoom() {
         mainWindow.webContents.insertCSS(cssStyles);
 
         checkupInterval = setInterval(function () {
-            mainWindow.webContents.executeJavaScript(ROOM_CHECKUP, true);
+            if (mainWindow !== null && mainWindow.webContents !== null) {
+                mainWindow.webContents.executeJavaScript(ROOM_CHECKUP, true);
+            }
         }, 3000);
     });
 
