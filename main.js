@@ -13,6 +13,37 @@ let config;
 let mainWindow;
 const configPath = path.join(process.env['HOME'], '.telepresence');
 
+const cssStyles = `
+#backdrop {
+    background: #1a1a1a !important;
+}
+
+#open-sidebar-container,
+#identity-menu-container,
+#js-left-menu,
+.room-footer,
+#room-menu {
+    display: none !important;
+}
+`;
+
+const ROOM_CHECKUP = `
+    (function() {
+        // ensure the sidebar stays hidden
+        var sidebar = document.querySelector('#side-bar-room');
+        if(sidebar !== null && sidebar.offsetParent !== null) {
+            var menuButton = document.querySelector('.menu-icon');
+            if(menuButton !== null)
+                menuButton.click();
+        }
+        
+        // ensure the video stream is enabled
+        var enableVideoButton = document.querySelector('.camera-icon.ng-hide');
+        if(enableVideoButton !== null)
+            enableVideoButton.click();
+    })();
+`;
+
 function createWindow() {
     if (config !== undefined && config.hasOwnProperty('conferenceId')) {
         openConferenceRoom();
@@ -48,27 +79,27 @@ function openConferenceRoom() {
         kiosk: true
     });
 
-    let fullScreenInterval;
-
-    const CLICK_FULLSCREEN_BUTTON = "document.querySelector('#positionA .fullscreen-icon').click();";
+    let checkupInterval;
 
     mainWindow.webContents.on('did-finish-load', function () {
-        fullScreenInterval = setInterval(function () {
-            mainWindow.webContents.executeJavaScript(CLICK_FULLSCREEN_BUTTON, true);
-        }, 1500);
+        mainWindow.webContents.insertCSS(cssStyles);
+
+        checkupInterval = setInterval(function () {
+            mainWindow.webContents.executeJavaScript(ROOM_CHECKUP, true);
+        }, 3000);
     });
 
     mainWindow.webContents.on('did-start-loading', function () {
-        clearInterval(fullScreenInterval);
+        clearInterval(checkupInterval);
     });
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
-        clearInterval(fullScreenInterval);
+        clearInterval(checkupInterval);
         mainWindow = null;
     });
 
-    let roomId = `rl-telepresence-${config.conferenceId}-${dateformat(new Date(), 'yyyy-mm-dd')}`;
+    let roomId = `rl-telepresence-${config.conferenceId}`;
 
     mainWindow.loadURL(`https://room.co/#/${roomId}`);
 }
