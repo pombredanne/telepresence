@@ -80,9 +80,17 @@ function openConferenceRoom() {
     });
 
     let checkupInterval;
+    let insertedCss = false;
 
     mainWindow.webContents.on('did-finish-load', function () {
-        mainWindow.webContents.insertCSS(cssStyles);
+        setTimeout(function () {
+            if (mainWindow !== null && mainWindow.webContents !== null) {
+                mainWindow.webContents.insertCSS(cssStyles);
+                insertedCss = true;
+            } else {
+                setTimeout(this, 500);
+            }
+        });
 
         checkupInterval = setInterval(function () {
             if (mainWindow !== null && mainWindow.webContents !== null) {
@@ -93,6 +101,7 @@ function openConferenceRoom() {
 
     mainWindow.webContents.on('did-start-loading', function () {
         clearInterval(checkupInterval);
+        insertedCss = false;
     });
 
     // Emitted when the window is closed.
